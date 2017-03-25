@@ -335,7 +335,7 @@ visa %>% filter(PREVAILING_WAGE >= 1000000 & EMPLOYER_NAME %in% top_employers & 
 
 #Finding the most common Worksites of the Foreign Worker's intented area of working 
 # for top 5 Employers and a wage > = 100000 USD
-visa %>% filter(PREVAILING_WAGE >= 100000 & EMPLOYER_NAME %in% top_employers & FULL_TIME_POSITION == 'Y') %>%
+visa %>% filter( EMPLOYER_NAME %in% top_employers & FULL_TIME_POSITION == 'Y') %>%
   group_by(WORKSITE) %>%
   summarise(count = n(),MEAN_WAGES = mean(PREVAILING_WAGE)) %>%
   arrange(desc(count)) -> common_Worksites
@@ -376,6 +376,100 @@ ggplot(aes(x  = reorder(JOB_TITLE,MONTHLY_WAGE,median), y = MONTHLY_WAGE),data =
   geom_boxplot(fill='red') + coord_flip(ylim = c(0,10000)) + 
   xlab("JOB TITLE") + ylab("WAGE Monthly(USD)") +
   get_theme()
+
+
+
+
+
+#PHASE3
+#WAGES OFFERED BY COMPANIES LIKE GOOGLE,AMAZON,FACEBOOK and their JOB TITLES:
+
+
+
+split_first <- function(word, split) {
+  # Function to obtain first value in a  strsplit
+  # Inputs:
+  # word      : word to be split
+  # split     : split parameter to be passed to strsplit
+  return(strsplit(word,split= split))
+}
+
+
+visa$EMPLOYER_COMPACT = sapply(visa$EMPLOYER_NAME,split_first,split = " ")
+
+#list of Jobs
+job_list <- c("Programmer","Computer","Software","Systems","Developer")
+
+#list of Employer names
+employer_list <- toupper(c("IBM","Infosys","Wipro","Tata","Deloitte","Amazon","Google","Microsoft","Facebook"))
+
+
+job_filter(visa,job_list) %>%
+  filter(EMPLOYER_COMPACT %in% employer_list) %>%
+  group_by(EMPLOYER_COMPACT) -> employer_df
+
+
+
+
+
+
+#DATA SCIENCETIST JOB ANALYSIS
+
+#Creating a list of data science Related Jobs
+job_list <- c("Data Scientist","Data Engineer","Machine Learning")
+
+
+job_filter(visa,job_list) %>%
+  
+
+
+#the Data frame
+data_science_df <- plot_input(job_filter(visa,job_list),
+                              "JOB_INPUT_CLASS",
+                              "YEAR",
+                              "TotalApps")
+
+h <- plot_output(data_science_df, "JOB_INPUT_CLASS","YEAR", "TotalApps", "JOB CLASS", "NO. OF APPLICATIONS")
+
+h
+
+#WAGES PLOT
+ggplot( aes( x = reorder(JOB_INPUT_CLASS,PREVAILING_WAGE,median) , y = PREVAILING_WAGE ), data = job_filter(visa,job_list)) + 
+  geom_boxplot(aes(fill=YEAR)) + 
+  get_theme() + 
+  xlab('JOB-TITLE') + 
+  ylab('Wages') +
+  coord_cartesian(ylim = c(25000,150000))
+
+
+
+
+#creating a list of jobs with Title such as business analysts and data analysts
+job_list1<-c("Business Analyst","Data Analyst",'Statistician')
+
+analyst_df <- plot_input(job_filter(visa,job_list1),
+                              "JOB_INPUT_CLASS",
+                              "YEAR",
+                              "TotalApps")
+
+p1 <- plot_output(analyst_df, "JOB_INPUT_CLASS","YEAR", "TotalApps", "JOB CLASS", "NO. OF APPLICATIONS")
+
+#highest applications for Business analyst  that too in 2016
+p1
+
+#Wages of all Job Titles
+ggplot(aes(x = reorder(JOB_INPUT_CLASS,PREVAILING_WAGE,median) , y = PREVAILING_WAGE ),data = job_filter(visa,job_list1)) + 
+  geom_boxplot(aes(fill=YEAR)) + 
+  get_theme() + 
+  xlab("JOB-TITLE") + 
+  ylab("WAGES(USD)") +
+  coord_cartesian(ylim=c(25000,100000))
+
+#highest sallary for Statisticians
+#Interesting trend is that the sallaries of All Data Analysts , Business Analysts
+# and Statisticians have all increased a bit over time from 2011-2016
+
+
 
 
 
