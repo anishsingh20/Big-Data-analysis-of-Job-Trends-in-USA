@@ -419,8 +419,78 @@ job_filter(visa,job_list) %>%
 job_list <- c("Data Scientist","Data Engineer","Machine Learning")
 
 
+#Employers which send applications for Data Science positions
+#filtering ie querying only jobs in job_list 
+#DATA SCIECNE DF
 job_filter(visa,job_list) %>%
+  group_by(EMPLOYER_NAME) %>%
+
+  select(EMPLOYER_NAME,SOC_NAME,WORKSITE,JOB_TITLE,PREVAILING_WAGE) %>%
+    
+      arrange(desc(PREVAILING_WAGE))->employ_data
+
+visa %>%
+  mutate(SOC_NAME = toupper(SOC_NAME)) -> visa
+
+
+#DATA SCIENCETIST POSITIONS in which DEPARTMENT?
+job_filter(visa,job_list) %>%
+  #filter(CASE_STATUS = 'CERTIFIED') 
+  filter(!is.na(SOC_NAME))  %>%
+  group_by(SOC_NAME) %>%
+    summarise(total_H1B_Applications= n() , Median_wages = median(PREVAILING_WAGE)) %>%
+      filter(total_H1B_Applications > 10 ) %>%
+          arrange(desc(total_H1B_Applications))->data_science_df1
+
+
+data_science_soc_df <- plot_input(job_filter(visa,job_list),
+                                  "SOC_NAME",
+                                  "YEAR",
+                                  filter = TRUE,
+                                  Ntop = 10)
+
+plot_output(data_science_soc_df, "SOC_NAME","YEAR", "TotalApps", "INDUSTRY", "NO. OF APPLICATIONS")
+#highest applications for STATISTICIANS AND SOFTWARE DEVELOPERS
+
   
+
+
+
+
+
+#COMPANIES WHICH ISSUE MOST DATA SCIENCE POSITIONS H1B-VISA APPLICATIONS
+job_filter(visa,job_list) %>%
+  select(EMPLOYER_NAME,JOB_TITLE,PREVAILING_WAGE,SOC_NAME) %>%
+  #filter(CASE_STATUS = 'CERTIFIED') 
+  
+  filter(!is.na(SOC_NAME))  %>%
+  group_by(EMPLOYER_NAME) %>%
+  
+  summarise(total_H1B_Applications= n() , Median_wages = median(PREVAILING_WAGE)) %>%
+  filter(total_H1B_Applications > 10 ) %>%
+  arrange(desc(total_H1B_Applications))->employer
+
+filter(employer , EMPLOYER_NAME == 'GOOGLE INC.')
+#only 13 applications send over 2011- 2016
+
+ggplot(aes(x = reorder(EMPLOYER_NAME,total_H1B_Applications), y =total_H1B_Applications ),data = employer[1:20,]) + 
+  geom_bar(stat='identity',fill='blue',color='black') + 
+  get_theme() + 
+  xlab(" Top 20 Employers of Data Science Positions") + 
+  ylab("No of H1B Applications issued") + 
+  coord_flip() 
+  
+  
+ggplot(aes(x = reorder(EMPLOYER_NAME,Median_wages), y = Median_wages ),data = employer[1:20,]) + 
+  geom_col(fill='black') + 
+  get_theme() + 
+  xlab(" Top 20 Employers of Data Science Positions") + 
+  ylab("WAGES(USD)") + 
+  coord_flip() 
+
+
+
+
 
 
 #the Data frame
@@ -440,6 +510,10 @@ ggplot( aes( x = reorder(JOB_INPUT_CLASS,PREVAILING_WAGE,median) , y = PREVAILIN
   xlab('JOB-TITLE') + 
   ylab('Wages') +
   coord_cartesian(ylim = c(25000,150000))
+
+
+
+
 
 
 
