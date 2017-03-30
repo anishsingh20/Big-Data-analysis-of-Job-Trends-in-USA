@@ -22,6 +22,7 @@ job_filter <- function(df,input_vec) {
   
   for(value in input_vec){
     new_df <- rbind(new_df, df %>% 
+                      #regexpr used for pattern matching and replacement
                       filter(regexpr(value,JOB_TITLE,ignore.case=TRUE) != -1) %>%
                       mutate(JOB_INPUT_CLASS = toupper(value)))
   }
