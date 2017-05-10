@@ -301,11 +301,7 @@ top_employers <- unlist(find_top(visa,"EMPLOYER_NAME","TotalApps",Ntop = 5))
 #finding most common job titles for the top 5 employers along with mean sallaries
 visa %>%
   filter(EMPLOYER_NAME %in% top_employers & FULL_TIME_POSITION == 'Y') %>%
-  group_by(JOB_TITLE,EMPLOYER_NAME) %>%
-  #count of each job titles 
-  summarise(COUNT = n()) %>%
-  #arranging in descending order of sallary
-  arrange(desc(COUNT)) -> common_jobs
+  select(JOB_TITLE,EMPLOYER_NAME,CASE_STATUS,PREVAILING_WAGE) -> common_jobs
 
 
 #plot for top 15 job titles of the top 5 employers with most petitions
@@ -574,6 +570,9 @@ plot_output(data_science_soc_df, "SOC_NAME","YEAR", "Wage", "INDUSTRY", "WAGE (U
 
 #MAP GENERATING FUNCTION which  returns  a USA MAP
 
+library(ggrepel)
+
+
 map_gen <- function(df,metric,USA,...) {
   # Function to generate map plot for given metric in df 
   # This is laid on top of USA map
@@ -603,7 +602,7 @@ map_gen <- function(df,metric,USA,...) {
   # First layer    : USA Map
   # Second layer   : geom_point() with point alpha and size varying with metric
   # Third layer    : points mapping to top locations using ggrepel package
-  map1 <- ggplot(USA, aes(x=long, y=lat)) + 
+  g <- ggplot(USA, aes(x=long, y=lat)) + 
     geom_polygon() + xlab("Longitude (deg)") + ylab("Latitude(deg)") + 
     geom_point(data=map_df, aes_string(x="lon", y="lat", label = "WORKSITE", alpha = metric, size = metric), color="yellow") + 
     geom_label_repel(data=map_df %>% filter(WORKSITE %in% top_locations),aes_string(x="lon", y="lat",label = "WORKSITE"),
@@ -619,15 +618,44 @@ map_gen <- function(df,metric,USA,...) {
     get_theme()
   
   #returns the USA map with jobs
-  return(map1)
+  return(g)
 }
 
-install.packages('ggrepel')
-library(ggrepel)
+
 
 
 USA = map_data(map = "usa")
 
-map1 <- map_gen(job_filter(visa,job_list),"TotalApps",USA,Ntop = 3)
+g <- map_gen(job_filter(visa,job_list),"TotalApps",USA,Ntop = 3)
 
-map1
+g
+
+
+
+
+
+
+prop.table(table(common_jobs$CASE_STATUS))
+
+require(neuralnet)
+
+?neuralnet
+train = subset(common_jobs,CASE_STATUS==c('CERTIFIED','WITHDRAWN'))
+train$CASE_STATUS<-ifelse(train$CASE_STATUS=='CERTIFIED',1,0)
+set.seed(1212)
+
+mod1<-neuralnet(CASE_STATUS ~  PREVAILING_WAGE ,data=train[sample(nrow(train),2000),],
+                hidden=2 ,
+                    err.fct = 'ce',linear.output = FALSE)
+summary(mod1)
+plot(mod1)
+mod1$weights
+mod1$net.result
+mod1
+
+test<-train[sample(nrow(train),2000),]
+predictions<-data.frame(compute(mod1,test[,4]))
+
+
+
+  
