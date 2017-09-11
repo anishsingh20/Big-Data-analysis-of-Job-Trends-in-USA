@@ -6,3 +6,13 @@ The H-1B is an employment-based, non-immigrant visa category for temporary forei
 
 Is the number of petitions with Data Engineer job title increasing over time? Which part of the US has the most Hardware Engineer jobs? Which industry has the most number of Data Scientist positions? Which employers file the most petitions each year?
 are some of the fascinating questions which we can think of and answers to such questions can only be achieved via exploring the data.
+
+
+----------------------
+
+
+### Plots
+
+Plot of top 10 firms who submit most H1B applications to employ professionals overseas. 
+
+![github logo](https://github.com/anishsingh20/Analyzing-Job-Trends-in-US-using-H1B-Visa-petitions/blob/master/final%20plots/Top10Employers.jpeg)
