@@ -1,3 +1,9 @@
+#Random sampling and forming smaller data set 
+small_visa<-sample_n(visa,5000)
+
+write.csv(small_visa , file = "smallvisa.csv", row.names = FALSE,na="")
+
+
 #important functions for simplified plotting 
 job_filter <- function(df,input_vec) {
   # Function to filter only the rows from dataframe 
