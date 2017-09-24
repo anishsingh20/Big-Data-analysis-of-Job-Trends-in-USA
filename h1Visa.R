@@ -222,7 +222,9 @@ get_theme <- function() {
 }
 
 
+#------------------------------------------------------------------------------------------------------
 
+                                        # DATA EXPLORATION
 
 #H-1B Visa Petitions -EDA and Predictive Analytics
 
@@ -642,26 +644,6 @@ g
 
 
 prop.table(table(common_jobs$CASE_STATUS))
-
-require(neuralnet)
-
-?neuralnet
-train = subset(common_jobs,CASE_STATUS==c('CERTIFIED','WITHDRAWN'))
-train$CASE_STATUS<-ifelse(train$CASE_STATUS=='CERTIFIED',1,0)
-set.seed(1212)
-
-mod1<-neuralnet(CASE_STATUS ~  PREVAILING_WAGE ,data=train[sample(nrow(train),2000),],
-                hidden=2 ,
-                    err.fct = 'ce',linear.output = FALSE)
-summary(mod1)
-plot(mod1)
-mod1$weights
-mod1$net.result
-mod1
-
-test<-train[sample(nrow(train),2000),]
-predictions<-data.frame(compute(mod1,test[,4]))
-
 
 
   
