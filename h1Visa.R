@@ -1,8 +1,22 @@
-#Random sampling and forming smaller data set 
-small_visa<-sample_n(visa,5000)
+#H-1B Visa Petitions data
 
-write.csv(small_visa , file = "smallvisa.csv", row.names = FALSE,na="")
+#Packages used
+library(ggplot2) # Data visualization
+library(readr) # CSV file I/O, e.g. the read_csv function
+library(dplyr)
+library(ggmap)
+library(tidyr) #for data reshaping and transformation
+library(ggrepel)
+library(lazyeval)
 
+visa<-read.csv('C:/Users/hp/Downloads/h1b_kaggle.csv')
+#Data frame consists of 3002458 observations
+
+str(visa) #checking the structure of data
+
+
+
+#Starting with making custom functions in R for easy processing and visualization of data.
 
 #important functions for simplified plotting 
 job_filter <- function(df,input_vec) {
@@ -222,24 +236,10 @@ get_theme <- function() {
 }
 
 
-#------------------------------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------------------------------------------#
 
-                                        # DATA EXPLORATION
+                                                                              ## DATA EXPLORATION
 
-#H-1B Visa Petitions -EDA and Predictive Analytics
-
-library(ggplot2) # Data visualization
-library(readr) # CSV file I/O, e.g. the read_csv function
-library(dplyr)
-library(ggmap)
-library(tidyr) #for data reshaping and transformation
-library(ggrepel)
-library(lazyeval)
-
-visa<-read.csv('C:/Users/hp/Downloads/h1b_kaggle.csv')
-#Data frame consists of 3002458 observations
-
-str(visa)
 
 
 #converting YEAR to a categorical variable
